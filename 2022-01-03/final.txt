@@ -1,0 +1,140 @@
+create database S1311034021;
+GO
+use S1311034021;
+GO
+
+create table students
+( s_no char(10)  ,
+  s_name varchar(10) ,
+  s_sex char(1),
+  s_birthday date,
+  s_phone char(10),
+  s_address varchar(100),
+  s_parents varchar(10)
+  primary key(s_no)
+);
+
+create table teachers
+(
+t_no char(10),
+t_name varchar(10)
+primary key(t_no)
+);
+
+create table courses
+(
+c_no char(5),
+c_name varchar(24),
+c_points int,
+c_time int,
+c_cost int,
+c_type char(6),
+c_bdate date,
+t_no char(10)
+primary key(c_no),
+foreign key(t_no) references teachers(t_no)
+);
+
+create table results
+(s_no char(10),
+c_no char(5),
+r_result float,
+r_type char(6),
+r_date date,
+foreign key (s_no) references students(s_no),
+foreign key (c_no) references courses(c_no),
+PRIMARY KEY(c_no,s_no)
+)
+
+create table Tmpdata
+( 
+  s_no char(10)  ,
+  s_name varchar(10) ,
+  s_sex char(1),
+  s_birthday date,
+  s_phone char(10),
+  s_address varchar(100),
+  s_parents varchar(10),
+  c_no char(5),
+  c_name varchar(24),
+  c_points int,
+  c_time int,
+  c_cost int,
+  c_type char(6),
+  c_bdate date,  
+  r_result float,
+  r_type char(6),
+  r_date date,
+  t_no char(10),
+  t_name varchar(10)
+);
+bulk insert Tmpdata from 'C:/dataTest.txt'
+with
+(
+fieldterminator ='\t',
+rowterminator ='\n'
+);
+insert into students(s_no,s_name,s_sex,s_birthday,s_phone,s_address,s_parents)
+select distinct s_no,s_name,s_sex,s_birthday,s_phone,s_address,s_parents from Tmpdata;
+select * from students;
+
+insert into teachers(t_no,t_name)
+select distinct t_no,t_name from Tmpdata;
+select * from teachers;
+
+insert into courses(c_no,c_name,c_points,c_time,c_cost,c_type,c_bdate,t_no)
+select distinct c_no,c_name,c_points,c_time,c_cost,c_type,c_bdate,t_no from Tmpdata;
+select * from courses;
+
+insert into results(s_no,c_no,r_result,r_type,r_date) 
+select distinct s_no,c_no,r_result,r_type,r_date from Tmpdata;
+select * from results;
+
+drop table Tmpdata;
+
+--第三題--
+
+SELECT c.t_no ,
+(select avg(r_result) from results where c_no like'c0007')
+FROM courses as c ,results as r where c.c_no =r.c_no group by c.t_no;
+	
+--第四題--
+	
+
+	select r.s_no,s.s_name from students as s, results as r where r.s_no = s.s_no and r.s_no not in 
+	(select r.s_no from  results as r,(select c_no from courses as c ,(select t_no from teachers where t_name like '林%') as t where c.t_no =t.t_no)as c where r.c_no=c.c_no);
+
+--第五題--
+
+	select c_no,count(c_no) as '修課人數' 
+	from results group by c_no having COUNT(*)>10 
+	ORDER BY COUNT(*) DESC,c_no ASC;
+
+--第六題--
+
+	select s.s_no '學號',s.s_name'姓名',sum(c.c_cost)as '費用' 
+	from students as s,results as r,courses as c 
+	where s.s_no=r.s_no and c.c_no=r.c_no group by s.s_no,s.s_name;
+
+--第七題--
+
+	select s.s_no'學號',s.s_name'姓名',c.c_type'課程類別',SUM(c.c_time) '修課總時數'
+	from students as s,results as r,courses as c 
+	where s.s_no=r.s_no and c.c_no=r.c_no 
+	group by s.s_no,s.s_name,c.c_type order by s.s_no ASC,c_type ASC;
+
+--第八題--
+
+	select c.c_no '課程編號',c.c_name'課程名稱',sum(c.c_cost)'收入' 
+	from students as s,results as r,courses as c 
+	where s.s_no=r.s_no and c.c_no=r.c_no group by c.c_no,c.c_name;
+
+--第九題--
+
+	select r.c_no '課程編號',c.c_name'課程名稱',AVG(r.r_result)'平均成績' 
+	from results as r,courses as c 
+	where r.c_no=c.c_no and c.c_type like '%年%' group by r.c_no,c.c_name;
+
+--第十題--
+
+	select c_type'課程類別',count(c_no)'課程數' from courses group by c_type;

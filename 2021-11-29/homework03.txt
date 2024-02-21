@@ -1,0 +1,24 @@
+--第一題--
+ 
+ select c.c_name,avg(r.r_result)as '平均分',convert(decimal(3,2),count(case when r.r_result >=60 then 1.0 else null end)*1.0/count(r.r_result)*1.0) as '及格率' from results as r,classes as c where c.c_no=r.c_no group by c.c_name order by '平均分'desc ; 
+
+--第二題--
+
+select s.s_no,s.s_name from (select a.s_no from (select * from results where c_no like'c0001') as a,
+(select * from results where c_no like 'c0003')as b where b.s_no=a.s_no and b.r_result>a.r_result)as r, students as s where s.s_no = r.s_no;
+
+--第三題--
+
+select s_no ,AVG(r_result)as 'average' from results group by s_no having avg(r_result)>60 ;
+
+--第四題--
+
+select s.s_no ,s.s_name ,count(r.c_no) as '選課數' ,sum(r_result)as '總成績' from students  as s ,results as r where r.s_no=s.s_no group by s.s_no,s_name;
+
+--第五題--
+
+select s.s_no ,s.s_name,count(r.c_no) as '選課數' from students  as s ,results as r  where r.s_no=s.s_no group by s.s_no,s_name having count(r.c_no)< (select count(c_no)from classes) ;
+
+--第六題--
+
+select c.c_no as '課程編號',c.c_name as'課程名稱',count(r.s_no)as '選課人數' from classes as c,results as r where r.c_no=c.c_no  group by c.c_no,c.c_name having count(r.s_no)<10;

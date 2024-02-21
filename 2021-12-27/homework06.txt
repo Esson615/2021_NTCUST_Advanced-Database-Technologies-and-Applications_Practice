@@ -1,0 +1,33 @@
+--第一題--
+
+select c.c_name,s.s_name,r.Rank, r.r_result from(select s_no, c_no,r_result,Dense_RANK() OVER (PARTITION BY c_no ORDER BY r_result DESC) AS Rank  from results ) as r,
+students as s ,classes as c 
+where r.Rank<3 and r.s_no=s.s_no and c.c_no=r.c_no;
+
+--第二題--
+
+select * from students as s 
+	where s.s_no in (select s_no from results where c_no in (select r.c_no from students as s, results as r where s.s_name like '林進財' and s.s_no = r.s_no))
+EXCEPT
+select * from students as s 
+	where s.s_no in (select s_no from results where c_no not in (select r.c_no from students as s, results as r where s.s_name like '林進財' and s.s_no = r.s_no))
+EXCEPT
+select * from students as s 
+	where s.s_no in (select s_no from results group by s_no having count(c_no) < (select count(c_no) from students as s, results as r where s.s_name like '林進財' and s.s_no = r.s_no))
+EXCEPT
+select s.* from students as s, results as r 
+	where s.s_name like '林進財' and s.s_no = r.s_no
+
+--第三題--
+
+SELECT s.s_sex ,AVG(YEAR(GETDATE())-Year(s.s_birthday)) as age FROM students AS s group by s.s_sex;
+
+--第四題--
+
+SELECT *FROM students WHERE YEAR(s_birthday)<1980;
+
+--第五題--
+
+SELECT s.s_no,s.s_name,c.c_name,r.r_result 
+FROM(SELECT c_no,AVG(r_result)AS AVG FROM results group by c_no)AS savg
+,students as s,classes as c , results as r where r.c_no=c.c_no and r.s_no = s.s_no and r.r_result>savg.AVG and savg.c_no=c.c_no;

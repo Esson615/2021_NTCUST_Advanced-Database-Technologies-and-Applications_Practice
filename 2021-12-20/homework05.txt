@@ -1,0 +1,23 @@
+--第一題--
+
+select s.s_name,c.c_name,r.r_result from results as r ,classes as c,students as s where r_result <=70 and r.c_no=c.c_no and s.s_no=r.s_no;
+
+--第二題--
+
+select r.s_no,s.s_name, avg(r_result)as 'average' from results as r ,students as s where  s.s_no=r.s_no group by r.s_no,s.s_name having AVG(r_result)>85;
+
+--第三題--
+
+select r.s_no,s.s_name,r.c_no,r.r_result  from results as r,students as s 
+where r.s_no=s.s_no and r.r_result>(select avg(r_result) as average
+from results) group by  r.s_no,s.s_name,r.c_no,r.r_result ;
+
+--第四題--
+
+select r.s_no,s.s_name,AVG(r.r_result),RANK() OVER (order by AVG(r.r_result) desc ) AS Rank 
+FROM results as r inner join students as s on r.s_no =s.s_no 
+group by r.s_no,s.s_name;
+
+--第五題--
+
+select s_no as '學號',SUBSTRING(s_name,1,1)as '姓氏',SUBSTRING(s_name,2,2)as '名字' from students;

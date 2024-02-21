@@ -1,0 +1,34 @@
+--第一題--
+ select s.s_no,s.s_name from students as s where s_no not in(select s_no from results where c_no in(select c_no from classes where c_name='機器人初階'))
+
+--第二題--
+
+ select s_no,r_result from results where c_no='C0006'and r_result<80 order by r_result desc; 
+
+--第三題--
+ 
+ select s_no,s_name,s_address from students where s_address like '%汐止鎮%';
+
+--第四題--
+
+select r.c_no as'課程編號',c.c_name as '課程名稱',max(r.r_result) as '最高分' ,min(r.r_result)as '最低分',avg(r.r_result) as '平均分'from classes as c,results as r where r.c_no=c.c_no group by  r.c_no,c.c_name;
+
+--第五題--
+
+select c_no,count(s_no)as '學生數'from results group by c_no order by '學生數';
+
+--第六題--
+
+select r.c_no,avg(r.r_result)as '平均成績' from (select s_no from students where s_address like'台北市%') as s,results as r where s.s_no=r.s_no group by r.c_no;
+
+--第七題--
+
+select s_no,s_name,s_address from students;
+update students set s_address = REPLACE(s_address,'台北縣%','新北市%') where s_address like '台北縣%';
+select * from students;
+
+--第八題--
+
+ select * from results where s_no ='S080400001' and c_no = 'C0001';
+ delete  from results where s_no ='S080400001' and c_no = 'C0001';
+ select* from results where s_no ='S080400001' ;

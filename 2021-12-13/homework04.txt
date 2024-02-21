@@ -1,0 +1,32 @@
+--第一題--
+
+select * from students where s_name like '林%' or s_name like '李%';
+
+--第二題--
+
+select distinct r1.c_no,r1.s_no,r1.r_result from results  r1,results  r2
+ where r1.c_no=r2.c_no and r1.s_no != r2.s_no and r1.r_result=r2.r_result;
+
+--第三題--
+
+select r.c_no,c.c_name ,
+sum(case when r_result >= 86 then 1 else 0 end)  '100-86',
+sum(case when r_result >= 70 and r_result <86 then  1 else 0 end)  '100-86',
+sum(case when r_result >= 60 and r_result <70 then 1 else 0 end)  '100-86',
+sum(case when r_result <  60 then 1 else 0 end)  '<60'
+from results  r, classes  c where c.c_no=r.c_no group by c.c_name,r.c_no order by r.c_no;
+
+--第四題--
+
+select r.s_no,s.s_name,sum(c.c_points)'學分數' 
+from students s, (select s_no,c_no from results where r_result >=60) r,classes  c 
+where s.s_no=r.s_no and c.c_no = r.c_no group by r.s_no ,s.s_name;
+
+--第五題--
+
+select s.s_sex '性別',avg(r.r_result) '平均' from students s, (select s_no,r_result from results where c_no like 'C0001') r where s.s_no=r.s_no group by s.s_sex;
+
+--第六題--
+
+BACKUP DATABASE s1311034021 TO DISK ='D:\BACKUP\s131034021.bak';
+
